@@ -39,15 +39,15 @@ int main()
 
     for(i=0;i<n;i++)
     {
-        printf("\nName: %s",s[i].name);
-        printf("\nRoll No:: %d",s[i].roll);
-        printf("\nTotal: %f",s[i].total);
-        printf("\nPercentage: %f",s[i].percentage);
+        printf("Name: %s",s[i].name);
+        printf("Roll No:: %d",s[i].roll);
+        printf("Total: %f",s[i].total);
+        printf("Percentage: %f",s[i].percentage);
 
         if(s[i].percentage>=40)
-            printf("\nResullt: Pass\n");
+            printf("Resullt: Pass\n");
         else
-            printf("\nResult: Fail\n");
+            printf("Result: Fail\n");
     }
     return 0;
 }
