@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C Programming in Space & Defense Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS VARIABLES & RESET ===== */
+:root {
+  --bg-deep: #020810;
+  --bg-mid: #050f1e;
+  --bg-card: rgba(8, 20, 42, 0.85);
+  --neon-blue: #00d4ff;
+  --neon-cyan: #00ffcc;
+  --neon-purple: #a855f7;
+  --neon-orange: #ff6b2b;
+  --neon-green: #39ff14;
+  --text-primary: #e2f0ff;
+  --text-muted: #7a9ab8;
+  --border-glow: rgba(0, 212, 255, 0.3);
+  --font-display: 'Orbitron', monospace;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-body: 'Exo 2', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+/* ===== NAV ===== */
+nav {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  background: rgba(2,8,16,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-glow);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1rem; color: var(--neon-blue);
+  letter-spacing: 2px;
+}
+.nav-links { display: flex; gap: 1.5rem; list-style: none; }
+.nav-links a {
+  color: var(--text-muted); text-decoration: none;
+  font-size: 0.75rem; font-family: var(--font-mono);
+  letter-spacing: 1px; text-transform: uppercase;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--neon-cyan); }
+
+/* ===== HERO ===== */
+#hero {
+  position: relative; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; overflow: hidden;
+}
+
+#starCanvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+
+.hero-content { position: relative; z-index: 2; max-width: 900px; padding: 2rem; }
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid var(--neon-blue);
+  color: var(--neon-blue);
+  padding: 0.4rem 1.2rem;
+  border-radius: 50px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  margin-bottom: 1.5rem;
+  animation: fadeInDown 0.8s ease;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease 0.2s both;
+}
+
+.hero-title .c-lang {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 30px rgba(0,255,204,0.6);
+}
+
+.hero-sub {
+  font-size: 1.1rem; color: var(--text-muted);
+  max-width: 600px; margin: 0 auto 2.5rem;
+  animation: fadeInUp 1s ease 0.4s both;
+}
+
+.hero-stats {
+  display: flex; gap: 2.5rem; justify-content: center;
+  animation: fadeInUp 1s ease 0.6s both;
+  flex-wrap: wrap;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num {
+  font-family: var(--font-display);
+  font-size: 1.8rem; color: var(--neon-cyan);
+}
+.hero-stat-label { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+
+.scroll-indicator {
+  position: absolute; bottom: 2rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  color: var(--text-muted); font-size: 0.7rem; letter-spacing: 2px;
+  animation: bounce 2s infinite;
+}
+.scroll-arrow { width: 20px; height: 20px; border-right: 2px solid var(--neon-blue); border-bottom: 2px solid var(--neon-blue); transform: rotate(45deg); }
+
+/* ===== SECTION COMMON ===== */
+section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; color: var(--neon-blue);
+  letter-spacing: 4px; text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+.section-desc { color: var(--text-muted); max-width: 650px; margin-bottom: 3rem; }
+
+/* Glass card */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,212,255,0.15);
+  border-color: rgba(0,212,255,0.5);
+}
+
+/* ===== WHY C SECTION ===== */
+#why-c { background: linear-gradient(180deg, transparent, rgba(0,212,255,0.03), transparent); }
+
+.why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+
+.why-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 1.8rem;
+  position: relative; overflow: hidden;
+  transition: all 0.3s;
+}
+.why-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.why-card:hover { transform: translateY(-5px); border-color: rgba(0,212,255,0.5); }
+.why-card:hover::before { opacity: 1; }
+
+.why-icon {
+  font-size: 2rem; margin-bottom: 1rem;
+  display: block;
+}
+.why-card h3 { font-family: var(--font-display); font-size: 0.9rem; color: var(--neon-cyan); margin-bottom: 0.6rem; letter-spacing: 1px; }
+.why-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+/* ===== COMPARISON SECTION ===== */
+#comparison { }
+
+.lang-tabs {
+  display: flex; gap: 1rem; margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-glow);
+  padding-bottom: 0;
+}
+.lang-tab {
+  padding: 0.8rem 1.8rem;
+  background: none; border: none;
+  font-family: var(--font-display);
+  font-size: 0.8rem; letter-spacing: 2px;
+  color: var(--text-muted);
+  cursor: pointer; position: relative;
+  transition: color 0.3s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.lang-tab.active { color: var(--neon-blue); border-bottom-color: var(--neon-blue); }
+.lang-tab:hover { color: var(--neon-cyan); }
+
+.lang-panel { display: none; animation: fadeIn 0.4s ease; }
+.lang-panel.active { display: block; }
+
+.comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+@media(max-width:768px){ .comparison-grid { grid-template-columns: 1fr; } }
+
+.code-block {
+  background: #020c18;
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.code-header {
+  background: rgba(0,212,255,0.08);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--neon-blue);
+  border-bottom: 1px solid rgba(0,212,255,0.15);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-r { background: #ff5f56; }
+.dot-y { background: #ffbd2e; }
+.dot-g { background: #27c93f; }
+pre {
+  padding: 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: pre;
+  color: #c9d7e5;
+}
+.kw { color: #569cd6; }
+.fn { color: #dcdcaa; }
+.str { color: #ce9178; }
+.cmt { color: #6a9955; font-style: italic; }
+.num { color: #b5cea8; }
+.type { color: #4ec9b0; }
+.op { color: var(--neon-cyan); }
+.pp { color: #c586c0; }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+@media(max-width:900px){ .metrics-grid { grid-template-columns: repeat(2,1fr); } }
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+}
+.metric-label { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.5rem; }
+.metric-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin: 0.5rem 0; }
+.metric-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.metric-val { font-family: var(--font-display); font-size: 0.85rem; }
+
+/* ===== CORE CONCEPTS ===== */
+#concepts { }
+
+.concept-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.concept-tab {
+  padding: 0.5rem 1.2rem;
+  background: rgba(0,212,255,0.05);
+  border: 1px solid var(--border-glow);
+  border-radius: 50px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem; color: var(--text-muted);
+  cursor: pointer; transition: all 0.3s;
+}
+.concept-tab.active, .concept-tab:hover {
+  background: rgba(0,212,255,0.15);
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+}
+
+.concept-panel { display: none; animation: fadeIn 0.4s ease; }
+.concept-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+@media(max-width:768px){ .concept-panel.active { grid-template-columns: 1fr; } }
+
+.concept-visual {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+
+/* Memory Box Visual */
+.mem-box {
+  display: flex; flex-direction: column; gap: 6px;
+  font-family: var(--font-mono); font-size: 0.8rem;
+}
+.mem-row {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 6px;
+  transition: all 0.3s;
+  cursor: default;
+}
+.mem-row:hover { border-color: var(--neon-cyan); background: rgba(0,255,204,0.05); }
+.mem-addr { color: var(--neon-purple); min-width: 90px; }
+.mem-val { color: var(--neon-cyan); min-width: 60px; }
+.mem-label { color: var(--text-muted); font-size: 0.75rem; }
+.mem-arrow { color: var(--neon-orange); }
+
+/* Stack/Heap Visual */
+.stack-heap { display: flex; gap: 1rem; }
+.mem-region { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.mem-region-title { font-family: var(--font-display); font-size: 0.7rem; text-align: center; margin-bottom: 0.5rem; letter-spacing: 2px; }
+.mem-block {
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono); font-size: 0.75rem;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: default;
+}
+.mem-block:hover { filter: brightness(1.3); transform: scaleX(1.02); }
+
+/* Bit Visual */
+.bit-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.bit {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  font-family: var(--font-mono); font-size: 0.9rem; font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+  user-select: none;
+}
+.bit-1 { background: rgba(0,255,204,0.2); border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 8px rgba(0,255,204,0.3); }
+.bit-0 { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); color: var(--text-muted); }
+.bit:hover { transform: scale(1.15); }
+
+/* Interrupt Timeline */
+.interrupt-timeline { position: relative; padding-left: 1.5rem; }
+.interrupt-timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple)); }
+.int-event {
+  position: relative; margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(0,212,255,0.05);
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 8px;
+  font-family: var(--font-mono); font-size: 0.75rem;
+  transition: all 0.3s;
+}
+.int-event::before {
+  content: '';
+  position: absolute; left: -1.5rem; top: 50%; transform: translate(-50%, -50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--neon-blue);
+  box-shadow: 0 0 8px var(--neon-blue);
+}
+.int-event:hover { border-color: var(--neon-cyan); background: rgba(0,255,204,0.05); }
+.int-event-title { color: var(--neon-cyan); margin-bottom: 2px; }
+.int-event-desc { color: var(--text-muted); font-size: 0.7rem; }
+
+/* ===== SATELLITE VISUALIZATION ===== */
+#satellite-viz {
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(0,20,60,0.8) 0%, var(--bg-deep) 70%);
+  border-radius: 24px;
+  overflow: hidden;
+  padding: 3rem 2rem;
+  margin: 2rem 0;
+  min-height: 500px;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+#satellite-canvas-wrap {
+  position: relative;
+  width: 500px; max-width: 100%;
+  height: 400px;
+}
+
+/* SVG Satellite */
+#sat-svg { width: 100%; height: 100%; }
+
+.sat-part {
+  cursor: pointer;
+  transition: filter 0.3s;
+}
+.sat-part:hover { filter: drop-shadow(0 0 12px var(--neon-cyan)); }
+
+/* Tooltip */
+#sat-tooltip {
+  position: absolute;
+  background: rgba(5,15,35,0.97);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 12px;
+  padding: 1.2rem;
+  width: 280px;
+  box-shadow: 0 8px 32px rgba(0,212,255,0.25);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.25s ease;
+  z-index: 10;
+  font-size: 0.82rem;
+}
+#sat-tooltip.visible { opacity: 1; transform: translateY(0); }
+#sat-tooltip h4 { font-family: var(--font-display); font-size: 0.85rem; color: var(--neon-cyan); margin-bottom: 0.4rem; }
+#sat-tooltip p { color: var(--text-muted); margin-bottom: 0.6rem; font-size: 0.78rem; }
+#sat-tooltip .tooltip-code {
+  background: #020c18;
+  border-radius: 6px;
+  padding: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #c9d7e5;
+  border: 1px solid rgba(0,212,255,0.2);
+}
+#sat-tooltip .tooltip-tag {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  background: rgba(168,85,247,0.15);
+  border: 1px solid rgba(168,85,247,0.4);
+  color: var(--neon-purple);
+  font-size: 0.65rem; letter-spacing: 1px;
+}
+
+/* ===== PIPELINE SECTION ===== */
+#pipeline { }
+
+.pipeline-flow {
+  display: flex; align-items: center; gap: 0;
+  overflow-x: auto; padding: 2rem 0;
+  flex-wrap: nowrap;
+}
+.pipe-step {
+  flex: 1; min-width: 140px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s;
+  cursor: default;
+}
+.pipe-step:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0,255,204,0.1);
+  transform: translateY(-4px);
+}
+.pipe-step.active-step {
+  border-color: var(--neon-cyan);
+  background: rgba(0,255,204,0.05);
+}
+.pipe-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
+.pipe-name { font-family: var(--font-display); font-size: 0.75rem; color: var(--neon-cyan); letter-spacing: 1px; }
+.pipe-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+.pipe-arrow {
+  color: var(--neon-blue);
+  font-size: 1.5rem;
+  padding: 0 0.5rem;
+  flex-shrink: 0;
+  animation: pulse-arrow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-arrow {
+  0%, 100% { opacity: 0.4; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(4px); }
+}
+
+.pipeline-sim {
+  margin-top: 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+.sim-title { font-family: var(--font-display); font-size: 0.8rem; color: var(--neon-blue); letter-spacing: 2px; margin-bottom: 1rem; }
+.sim-log {
+  height: 140px; overflow-y: auto;
+  font-family: var(--font-mono); font-size: 0.75rem;
+  line-height: 1.8; color: var(--neon-green);
+  background: #010810;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(57,255,20,0.15);
+}
+.log-entry { animation: fadeInLeft 0.3s ease; }
+.log-time { color: var(--text-muted); }
+.log-ok { color: var(--neon-green); }
+.log-warn { color: var(--neon-orange); }
+.log-data { color: var(--neon-cyan); }
+.sim-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.5rem;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid var(--neon-blue);
+  border-radius: 8px;
+  color: var(--neon-blue);
+  font-family: var(--font-mono);
+  font-size: 0.8rem; letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.sim-btn:hover { background: rgba(0,212,255,0.2); box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+
+/* ===== REAL WORLD SECTION ===== */
+#realworld { }
+
+.realworld-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+
+.rw-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: default;
+}
+.rw-card:hover { transform: translateY(-6px); border-color: rgba(0,212,255,0.5); box-shadow: 0 16px 40px rgba(0,0,0,0.5); }
+
+.rw-header {
+  padding: 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+  border-bottom: 1px solid var(--border-glow);
+}
+.rw-emoji { font-size: 2.2rem; }
+.rw-title-wrap {}
+.rw-title { font-family: var(--font-display); font-size: 0.9rem; color: var(--neon-cyan); }
+.rw-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+.rw-body { padding: 1.2rem 1.5rem; }
+.rw-body p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem; }
+.rw-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
+.rw-tag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.65rem; letter-spacing: 1px;
+  border: 1px solid;
+}
+.tag-blue { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.4); color: var(--neon-blue); }
+.tag-purple { background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.4); color: var(--neon-purple); }
+.tag-green { background: rgba(57,255,20,0.1); border-color: rgba(57,255,20,0.4); color: var(--neon-green); }
+.tag-orange { background: rgba(255,107,43,0.1); border-color: rgba(255,107,43,0.4); color: var(--neon-orange); }
+
+/* ===== FAULT TOLERANCE ===== */
+#fault { }
+
+.fault-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+@media(max-width:768px){ .fault-grid { grid-template-columns: 1fr; } }
+
+.fault-flow { display: flex; flex-direction: column; gap: 1rem; }
+.fault-node {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  border: 1px solid;
+  transition: all 0.3s;
+  cursor: default;
+  font-family: var(--font-mono); font-size: 0.82rem;
+}
+.fault-node:hover { transform: translateX(6px); }
+.fault-node.fault { border-color: rgba(255,107,43,0.5); background: rgba(255,107,43,0.07); }
+.fault-node.detect { border-color: rgba(255,189,46,0.5); background: rgba(255,189,46,0.07); }
+.fault-node.recover { border-color: rgba(57,255,20,0.5); background: rgba(57,255,20,0.07); }
+.fault-node.safe { border-color: rgba(0,212,255,0.5); background: rgba(0,212,255,0.07); }
+.fault-icon { font-size: 1.5rem; }
+.fault-text-wrap {}
+.fault-node-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+.fault-node.fault .fault-node-title { color: var(--neon-orange); }
+.fault-node.detect .fault-node-title { color: #ffbd2e; }
+.fault-node.recover .fault-node-title { color: var(--neon-green); }
+.fault-node.safe .fault-node-title { color: var(--neon-cyan); }
+.fault-node-desc { font-size: 0.72rem; color: var(--text-muted); }
+.fault-connector { width: 2px; height: 24px; background: linear-gradient(var(--neon-orange), var(--neon-green)); margin-left: 2.2rem; }
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center; padding: 3rem 2rem;
+  border-top: 1px solid var(--border-glow);
+  font-family: var(--font-mono); font-size: 0.75rem;
+  color: var(--text-muted);
+}
+footer span { color: var(--neon-cyan); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInLeft { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
+@keyframes orbit { from { transform: rotate(0deg) translateX(160px) rotate(0deg); } to { transform: rotate(360deg) translateX(160px) rotate(-360deg); } }
+@keyframes glow-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+@keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Reveal on scroll */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px) {
+  .nav-links { display: none; }
+  .pipeline-flow { flex-direction: column; }
+  .pipe-arrow { transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="nav-logo">C/SPACE</div>
+  <ul class="nav-links">
+    <li><a href="#why-c">WHY C</a></li>
+    <li><a href="#comparison">COMPARE</a></li>
+    <li><a href="#concepts">CONCEPTS</a></li>
+    <li><a href="#satellite">SATELLITE</a></li>
+    <li><a href="#realworld">SYSTEMS</a></li>
+    <li><a href="#fault">FAULT</a></li>
+  </ul>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="hero" style="max-width:100%;padding:0;margin:0;">
+  <canvas id="starCanvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-badge">MISSION CRITICAL COMPUTING</div>
+    <h1 class="hero-title">
+      <span class="c-lang">C PROGRAMMING</span><br>
+      IN SPACE &amp; DEFENSE SYSTEMS
+    </h1>
+    <p class="hero-sub">Where precision is non-negotiable, milliseconds decide missions, and every byte of memory counts — C remains the backbone of humanity's most critical software.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">50+</div>
+        <div class="hero-stat-label">years in production</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">&lt;1μs</div>
+        <div class="hero-stat-label">real-time response</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">100%</div>
+        <div class="hero-stat-label">hardware control</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">0</div>
+        <div class="hero-stat-label">runtime overhead</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>EXPLORE</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ===== WHY C ===== -->
+<section id="why-c" class="reveal">
+  <div class="section-label">// 01 — FOUNDATION</div>
+  <h2 class="section-title">Why C Dominates<br><span style="color:var(--neon-cyan)">Space & Defense</span></h2>
+  <p class="section-desc">In environments where failure is catastrophic and resources are scarce, C offers unmatched control, predictability, and performance.</p>
+  <div class="why-grid">
+    <div class="why-card">
+      <span class="why-icon">⚡</span>
+      <h3>DETERMINISTIC EXECUTION</h3>
+      <p>C compiles to bare-metal machine code with no virtual machine, no garbage collector, and no runtime surprises. Every instruction executes in a predictable, measurable time window — critical for real-time control loops.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">🔩</span>
+      <h3>DIRECT HARDWARE ACCESS</h3>
+      <p>C pointers map directly to memory-mapped hardware registers. A satellite thruster, a sensor ADC, a gyroscope interface — all accessible at register level without OS abstraction layers or driver overhead.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">🧠</span>
+      <h3>FULL MEMORY CONTROL</h3>
+      <p>Dynamic memory allocation is explicit and predictable. Embedded systems often use static allocation entirely — no heap fragmentation, no unpredictable pauses, no surprise crashes at 400km altitude.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">🛡️</span>
+      <h3>CERTIFIED & TRUSTED</h3>
+      <p>MISRA-C, DO-178C, and NASA's Power of Ten rules govern C in safety-critical systems. Decades of toolchain maturity, formal verification support, and DO-333 compliant compilers make C the gold standard.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">📦</span>
+      <h3>MINIMAL FOOTPRINT</h3>
+      <p>A microcontroller with 32KB of flash and 4KB of RAM runs complex flight control logic in C. No Python runtime (10MB+), no JVM (100MB+). C does more with less — always.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">🔄</span>
+      <h3>INTERRUPT-DRIVEN DESIGN</h3>
+      <p>C integrates directly with hardware interrupt service routines (ISRs). A sensor event can trigger a C function in microseconds — no thread scheduler, no event queue, just direct, low-latency response.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMPARISON ===== -->
+<section id="comparison" class="reveal">
+  <div class="section-label">// 02 — LANGUAGE COMPARISON</div>
+  <h2 class="section-title">C vs Python vs Java<br><span style="color:var(--neon-cyan)">Same Problem, Different Worlds</span></h2>
+  <p class="section-desc">Reading sensor data and firing an actuator — three languages, three radically different approaches. Click each tab to explore.</p>
+
+  <div class="lang-tabs">
+    <button class="lang-tab active" onclick="switchLang('c')">C</button>
+    <button class="lang-tab" onclick="switchLang('python')">Python</button>
+    <button class="lang-tab" onclick="switchLang('java')">Java</button>
+  </div>
+
+  <!-- C Panel -->
+  <div class="lang-panel active" id="panel-c">
+    <div class="comparison-grid">
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>
+          sensor_control.c
+        </div>
+        <pre><span class="pp">#include</span> <span class="str">&lt;stdint.h&gt;</span>
+<span class="pp">#include</span> <span class="str">"hardware_regs.h"</span>
+
+<span class="cmt">/* Memory-mapped hardware registers */</span>
+<span class="pp">#define</span> SENSOR_REG  <span class="op">*</span>(<span class="type">volatile uint16_t</span><span class="op">*</span>)<span class="num">0x40001000</span>
+<span class="pp">#define</span> THRUSTER_REG <span class="op">*</span>(<span class="type">volatile uint8_t</span><span class="op">*</span>)<span class="num">0x40002000</span>
+
+<span class="cmt">/* ISR: fires in &lt;2μs on sensor event */</span>
+<span class="type">void</span> <span class="fn">__attribute__</span>((interrupt)) <span class="fn">SENSOR_IRQ</span>(<span class="type">void</span>) {
+    <span class="type">uint16_t</span> raw = SENSOR_REG;
+    <span class="type">int32_t</span>  val = (<span class="type">int32_t</span>)raw - <span class="num">32768</span>;
+
+    <span class="kw">if</span> (val <span class="op">&gt;</span> THRESHOLD) {
+        THRUSTER_REG <span class="op">=</span> <span class="num">0xFF</span>; <span class="cmt">/* full thrust */</span>
+    } <span class="kw">else</span> {
+        THRUSTER_REG <span class="op">=</span> <span class="num">0x00</span>; <span class="cmt">/* off */</span>
+    }
+    SENSOR_FLAG <span class="op">=</span> <span class="num">0</span>; <span class="cmt">/* clear interrupt */</span>
+}</pre>
+      </div>
+      <div>
+        <div class="glass-card" style="margin-bottom:1rem;">
+          <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:0.8rem;">EXECUTION MODEL</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);">Compiled directly to ARM/x86 machine code. Zero runtime overhead. Interrupt handler fires at hardware speed. Pointer directly dereferences the hardware register address.</p>
+        </div>
+        <div class="glass-card">
+          <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:0.8rem;">WHY C WINS HERE</h3>
+          <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1.2rem;line-height:2;">
+            <li>Register-level hardware access via pointer</li>
+            <li>Interrupt latency: deterministic &lt;2μs</li>
+            <li>Binary size: ~200 bytes compiled</li>
+            <li>Memory: stack-only, 0 allocations</li>
+            <li>No GC, no interpreter, no JIT warmup</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Speed</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:98%;background:var(--neon-cyan);"></div></div>
+        <div class="metric-val" style="color:var(--neon-cyan);">NATIVE</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Memory Control</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:100%;background:var(--neon-green);"></div></div>
+        <div class="metric-val" style="color:var(--neon-green);">FULL</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">HW Access</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:100%;background:var(--neon-blue);"></div></div>
+        <div class="metric-val" style="color:var(--neon-blue);">REGISTER</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Footprint</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:95%;background:var(--neon-purple);"></div></div>
+        <div class="metric-val" style="color:var(--neon-purple);">MINIMAL</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Python Panel -->
+  <div class="lang-panel" id="panel-python">
+    <div class="comparison-grid">
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>
+          sensor_control.py
+        </div>
+        <pre><span class="cmt"># Python - requires RPi.GPIO or similar</span>
+<span class="kw">import</span> RPi.GPIO <span class="kw">as</span> GPIO
+<span class="kw">import</span> time
+
+SENSOR_PIN  = <span class="num">17</span>
+THRUSTER_PIN = <span class="num">27</span>
+THRESHOLD   = <span class="num">512</span>
+
+<span class="kw">def</span> <span class="fn">read_sensor</span>():
+    <span class="cmt"># Abstracted via OS driver - NOT direct register</span>
+    <span class="kw">return</span> GPIO.<span class="fn">input</span>(SENSOR_PIN)
+
+<span class="kw">def</span> <span class="fn">control_loop</span>():
+    <span class="kw">while</span> <span class="kw">True</span>:
+        val = <span class="fn">read_sensor</span>()
+        <span class="kw">if</span> val <span class="op">&gt;</span> THRESHOLD:
+            GPIO.<span class="fn">output</span>(THRUSTER_PIN, GPIO.HIGH)
+        <span class="kw">else</span>:
+            GPIO.<span class="fn">output</span>(THRUSTER_PIN, GPIO.LOW)
+        time.<span class="fn">sleep</span>(<span class="num">0.001</span>) <span class="cmt"># 1ms poll - NOT interrupt!</span>
+
+<span class="cmt"># GIL, interpreter overhead, GC pauses,</span>
+<span class="cmt"># OS scheduling - ALL unpredictable!</span></pre>
+      </div>
+      <div>
+        <div class="glass-card" style="margin-bottom:1rem;border-color:rgba(255,107,43,0.3);">
+          <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-orange);margin-bottom:0.8rem;">EXECUTION MODEL</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);">Interpreted by CPython VM. Each line parsed at runtime. No true interrupt support — relies on polling loops. GIL prevents true parallelism. Garbage collector can pause execution for 50-100ms unpredictably.</p>
+        </div>
+        <div class="glass-card" style="border-color:rgba(255,107,43,0.3);">
+          <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-orange);margin-bottom:0.8rem;">CRITICAL LIMITATIONS</h3>
+          <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1.2rem;line-height:2;">
+            <li>GC pauses: non-deterministic (up to 100ms)</li>
+            <li>Runtime required: ~30MB minimum</li>
+            <li>No direct hardware register access</li>
+            <li>Polling instead of interrupts = latency</li>
+            <li>Cannot run on bare-metal MCUs</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Speed</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:25%;background:var(--neon-orange);"></div></div>
+        <div class="metric-val" style="color:var(--neon-orange);">SLOW</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Memory Control</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:20%;background:var(--neon-orange);"></div></div>
+        <div class="metric-val" style="color:var(--neon-orange);">GC MANAGED</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">HW Access</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:30%;background:var(--neon-orange);"></div></div>
+        <div class="metric-val" style="color:var(--neon-orange);">ABSTRACTED</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Footprint</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:15%;background:var(--neon-orange);"></div></div>
+        <div class="metric-val" style="color:var(--neon-orange);">HEAVY</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Java Panel -->
+  <div class="lang-panel" id="panel-java">
+    <div class="comparison-grid">
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>
+          SensorController.java
+        </div>
+        <pre><span class="cmt">// Java - requires JVM (100MB+)</span>
+<span class="kw">import</span> com.pi4j.io.gpio.*;
+
+<span class="kw">public class</span> <span class="type">SensorController</span> {
+    <span class="kw">private static final int</span> THRESHOLD = <span class="num">512</span>;
+    <span class="kw">private</span> <span class="type">GpioController</span> gpio;
+    <span class="kw">private</span> <span class="type">GpioPinDigitalOutput</span> thruster;
+
+    <span class="kw">public</span> <span class="fn">SensorController</span>() {
+        <span class="cmt">// JVM startup: ~300-500ms latency</span>
+        gpio = GpioFactory.<span class="fn">getInstance</span>();
+        thruster = gpio.<span class="fn">provisionDigitalOutputPin</span>(
+            RaspiPin.GPIO_01, <span class="str">"Thruster"</span>,
+            PinState.LOW
+        );
+    }
+
+    <span class="kw">public void</span> <span class="fn">controlLoop</span>() <span class="kw">throws</span> <span class="type">Exception</span> {
+        <span class="kw">while</span> (<span class="kw">true</span>) {
+            <span class="kw">int</span> val = <span class="fn">readSensor</span>(); <span class="cmt">// via JNI bridge</span>
+            thruster.<span class="fn">setState</span>(val <span class="op">&gt;</span> THRESHOLD
+                ? PinState.HIGH : PinState.LOW);
+            <span class="type">Thread</span>.<span class="fn">sleep</span>(<span class="num">1</span>); <span class="cmt">// JVM scheduler, not RT</span>
+        }
+    }
+}</pre>
+      </div>
+      <div>
+        <div class="glass-card" style="margin-bottom:1rem;border-color:rgba(168,85,247,0.3);">
+          <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-purple);margin-bottom:0.8rem;">EXECUTION MODEL</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);">Runs on JVM with JIT compilation. Hardware access via JNI bridge adds overhead. Full garbage collection (stop-the-world GC). JVM startup latency of 300-500ms is catastrophic for real-time systems.</p>
+        </div>
+        <div class="glass-card" style="border-color:rgba(168,85,247,0.3);">
+          <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-purple);margin-bottom:0.8rem;">CRITICAL LIMITATIONS</h3>
+          <ul style="font-size:0.82rem;color:var(--text-muted);padding-left:1.2rem;line-height:2;">
+            <li>JVM overhead: 100MB+ RAM required</li>
+            <li>Stop-the-world GC: non-deterministic</li>
+            <li>JNI bridge for hardware = extra latency</li>
+            <li>JIT warmup before peak performance</li>
+            <li>Cannot run on bare-metal MCUs at all</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Speed</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:55%;background:var(--neon-purple);"></div></div>
+        <div class="metric-val" style="color:var(--neon-purple);">MEDIUM</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Memory Control</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:20%;background:var(--neon-purple);"></div></div>
+        <div class="metric-val" style="color:var(--neon-purple);">GC MANAGED</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">HW Access</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:20%;background:var(--neon-purple);"></div></div>
+        <div class="metric-val" style="color:var(--neon-purple);">JNI ONLY</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Footprint</div>
+        <div class="metric-bar"><div class="metric-fill" style="width:10%;background:var(--neon-purple);"></div></div>
+        <div class="metric-val" style="color:var(--neon-purple);">VERY HEAVY</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CORE CONCEPTS ===== -->
+<section id="concepts" class="reveal">
+  <div class="section-label">// 03 — CORE CONCEPTS</div>
+  <h2 class="section-title">C Concepts That<br><span style="color:var(--neon-cyan)">Power Real Hardware</span></h2>
+  <p class="section-desc">These fundamental C features are what make satellite control, missile guidance, and spacecraft navigation possible. Click each concept to explore.</p>
+
+  <div class="concept-tabs">
+    <button class="concept-tab active" onclick="switchConcept('pointers')">🔗 Pointers</button>
+    <button class="concept-tab" onclick="switchConcept('memory')">🧠 Memory</button>
+    <button class="concept-tab" onclick="switchConcept('bits')">⚙️ Bit Manipulation</button>
+    <button class="concept-tab" onclick="switchConcept('interrupts')">⚡ Interrupts</button>
+  </div>
+
+  <!-- POINTERS -->
+  <div class="concept-panel active" id="concept-pointers">
+    <div class="concept-visual">
+      <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:1rem;">MEMORY MAP — POINTER VISUALIZATION</h3>
+      <div class="mem-box">
+        <div class="mem-row"><span class="mem-addr">0x40001000</span><span class="mem-val">0x03FF</span><span class="mem-arrow">← SENSOR_REG</span><span class="mem-label">(hardware register)</span></div>
+        <div class="mem-row"><span class="mem-addr">0x20000004</span><span class="mem-val">0x40001000</span><span class="mem-arrow">← *ptr</span><span class="mem-label">(pointer holds address)</span></div>
+        <div class="mem-row"><span class="mem-addr">0x20000008</span><span class="mem-val">1023</span><span class="mem-arrow">← val</span><span class="mem-label">(dereferenced value)</span></div>
+        <div class="mem-row"><span class="mem-addr">0x40002000</span><span class="mem-val">0xFF</span><span class="mem-arrow">← THRUSTER_REG</span><span class="mem-label">(output register)</span></div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.8rem;">💡 Hover each row. A pointer is simply a variable that stores a memory address. Dereferencing it (<code style="color:var(--neon-cyan)">*ptr</code>) reads the value at that address — even hardware registers.</p>
+    </div>
+    <div>
+      <div class="code-block" style="margin-bottom:1rem;">
+        <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>hardware_pointer.c</div>
+        <pre><span class="cmt">/* Direct hardware register access */</span>
+<span class="type">volatile uint16_t</span> <span class="op">*</span>sensor_ptr =
+    (<span class="type">volatile uint16_t</span> <span class="op">*</span>)<span class="num">0x40001000</span>;
+
+<span class="type">volatile uint8_t</span> <span class="op">*</span>thruster_ptr =
+    (<span class="type">volatile uint8_t</span> <span class="op">*</span>)<span class="num">0x40002000</span>;
+
+<span class="type">void</span> <span class="fn">control_thrust</span>(<span class="type">void</span>) {
+    <span class="cmt">/* Read sensor — goes directly to HW */</span>
+    <span class="type">uint16_t</span> raw = <span class="op">*</span>sensor_ptr;
+
+    <span class="cmt">/* Write thruster — direct register write */</span>
+    <span class="kw">if</span> (raw <span class="op">&gt;</span> <span class="num">2048</span>)
+        <span class="op">*</span>thruster_ptr = <span class="num">0xFF</span>; <span class="cmt">/* ON */</span>
+    <span class="kw">else</span>
+        <span class="op">*</span>thruster_ptr = <span class="num">0x00</span>; <span class="cmt">/* OFF */</span>
+}</pre>
+      </div>
+      <div class="glass-card">
+        <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:0.8rem;">REAL-WORLD APPLICATION</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);">The Mars Curiosity rover's flight software uses C pointers to directly access sensor ADCs, camera interfaces, and motor controllers. The <code style="color:var(--neon-cyan)">volatile</code> keyword prevents compiler optimization from caching the register value — because hardware can change it at any moment.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMORY -->
+  <div class="concept-panel" id="concept-memory">
+    <div class="concept-visual">
+      <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:1rem;">STACK vs HEAP DIAGRAM</h3>
+      <div class="stack-heap">
+        <div class="mem-region">
+          <div class="mem-region-title" style="color:var(--neon-cyan);">STACK</div>
+          <div class="mem-block" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.4);color:var(--neon-cyan);">control_loop()</div>
+          <div class="mem-block" style="background:rgba(0,212,255,0.10);border:1px solid rgba(0,212,255,0.3);color:var(--neon-cyan);">read_sensor()</div>
+          <div class="mem-block" style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);color:var(--text-muted);">local vars</div>
+          <div class="mem-block" style="background:rgba(0,212,255,0.03);border:1px solid rgba(0,212,255,0.1);color:var(--text-muted);font-size:0.7rem;">return addr</div>
+          <p style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;text-align:center;">Auto managed<br>Predictable size<br>LIFO order</p>
+        </div>
+        <div style="width:2px;background:linear-gradient(var(--neon-cyan),var(--neon-purple));margin:0 0.5rem;border-radius:2px;"></div>
+        <div class="mem-region">
+          <div class="mem-region-title" style="color:var(--neon-purple);">HEAP</div>
+          <div class="mem-block" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);color:var(--neon-purple);">malloc(256)</div>
+          <div class="mem-block" style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);color:var(--text-muted);">[FREE BLOCK]</div>
+          <div class="mem-block" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);color:var(--neon-purple);">malloc(64)</div>
+          <div class="mem-block" style="background:rgba(255,107,43,0.1);border:1px solid rgba(255,107,43,0.3);color:var(--neon-orange);">⚠ FRAGMENTED</div>
+          <p style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;text-align:center;">Manual control<br>Can fragment<br>Use cautiously!</p>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:1rem;">💡 Space systems often use <strong style="color:var(--neon-cyan)">static allocation only</strong> — all buffers allocated at compile time, no malloc() in flight code.</p>
+    </div>
+    <div>
+      <div class="code-block" style="margin-bottom:1rem;">
+        <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>memory_management.c</div>
+        <pre><span class="cmt">/* STATIC allocation — preferred in space SW */</span>
+<span class="kw">static</span> <span class="type">uint8_t</span> telemetry_buf[<span class="num">512</span>]; <span class="cmt">/* fixed size */</span>
+<span class="kw">static</span> <span class="type">SensorData</span> sensor_history[<span class="num">100</span>];
+
+<span class="cmt">/* DYNAMIC — use sparingly, only init phase */</span>
+<span class="type">uint8_t</span> <span class="op">*</span>img_buf = <span class="fn">malloc</span>(<span class="num">640</span> <span class="op">*</span> <span class="num">480</span>);
+<span class="kw">if</span> (!img_buf) {
+    <span class="fn">safe_mode_entry</span>(); <span class="cmt">/* ALWAYS check! */</span>
+    <span class="kw">return</span> ERR_NOMEM;
+}
+<span class="cmt">/* ... use buffer ... */</span>
+<span class="fn">free</span>(img_buf); <span class="cmt">/* ALWAYS free — no GC in C */</span>
+img_buf = <span class="kw">NULL</span>; <span class="cmt">/* Prevent use-after-free */</span></pre>
+      </div>
+      <div class="glass-card">
+        <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:0.8rem;">NASA'S RULE</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);">NASA's Power of Ten rules for safety-critical C code: <strong style="color:var(--neon-cyan)">Rule 3</strong> — Do not use dynamic memory allocation after initialization. All memory is statically allocated at startup, so the system's memory footprint is completely predictable for the entire mission duration.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BITS -->
+  <div class="concept-panel" id="concept-bits">
+    <div class="concept-visual">
+      <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:0.5rem;">REGISTER BIT TOGGLE — CLICK BITS TO FLIP</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:1rem;">Simulating a GPIO control register. Each bit controls one hardware pin.</p>
+      <div class="bit-row" id="bitRow"></div>
+      <div style="margin-top:1rem;font-family:var(--font-mono);font-size:0.8rem;">
+        <span style="color:var(--text-muted);">REG VALUE: </span>
+        <span id="bitHex" style="color:var(--neon-cyan);">0x00</span>
+        <span style="color:var(--text-muted);margin-left:1rem;">PINS ON: </span>
+        <span id="bitCount" style="color:var(--neon-green);">0</span>
+      </div>
+      <div style="margin-top:0.8rem;font-size:0.75rem;color:var(--text-muted);">
+        <span style="color:var(--neon-orange);">Pin 7</span> = Thruster A &nbsp;
+        <span style="color:var(--neon-cyan);">Pin 6</span> = Thruster B &nbsp;
+        <span style="color:var(--neon-purple);">Pin 5</span> = Sensor EN &nbsp;
+        <span style="color:var(--neon-green);">Pin 4</span> = Watchdog
+      </div>
+    </div>
+    <div>
+      <div class="code-block" style="margin-bottom:1rem;">
+        <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>bit_manipulation.c</div>
+        <pre><span class="pp">#define</span> THRUSTER_A  (<span class="num">1</span> <span class="op">&lt;&lt;</span> <span class="num">7</span>)  <span class="cmt">/* bit 7 */</span>
+<span class="pp">#define</span> THRUSTER_B  (<span class="num">1</span> <span class="op">&lt;&lt;</span> <span class="num">6</span>)  <span class="cmt">/* bit 6 */</span>
+<span class="pp">#define</span> SENSOR_EN   (<span class="num">1</span> <span class="op">&lt;&lt;</span> <span class="num">5</span>)  <span class="cmt">/* bit 5 */</span>
+<span class="pp">#define</span> WATCHDOG    (<span class="num">1</span> <span class="op">&lt;&lt;</span> <span class="num">4</span>)  <span class="cmt">/* bit 4 */</span>
+
+<span class="type">volatile uint8_t</span> <span class="op">*</span>ctrl_reg =
+    (<span class="type">volatile uint8_t</span><span class="op">*</span>)<span class="num">0x40002000</span>;
+
+<span class="cmt">/* Set bit — turn on thruster A */</span>
+<span class="op">*</span>ctrl_reg <span class="op">|=</span> THRUSTER_A;
+
+<span class="cmt">/* Clear bit — turn off thruster A */</span>
+<span class="op">*</span>ctrl_reg <span class="op">&amp;=</span> <span class="op">~</span>THRUSTER_A;
+
+<span class="cmt">/* Toggle — flip current state */</span>
+<span class="op">*</span>ctrl_reg <span class="op">^=</span> SENSOR_EN;
+
+<span class="cmt">/* Test bit — is sensor enabled? */</span>
+<span class="kw">if</span> (<span class="op">*</span>ctrl_reg <span class="op">&amp;</span> SENSOR_EN) {
+    <span class="fn">read_sensor_data</span>();
+}</pre>
+      </div>
+      <div class="glass-card">
+        <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:0.8rem;">WHY BIT MANIPULATION MATTERS</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);">Every hardware peripheral — UART, SPI, I²C, GPIO — is controlled via registers where individual bits represent different functions. In a spacecraft, a single register write can fire a thruster, enable a sensor, and toggle a watchdog in one atomic operation. Python or Java can't do this.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERRUPTS -->
+  <div class="concept-panel" id="concept-interrupts">
+    <div class="concept-visual">
+      <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:1rem;">INTERRUPT SYSTEM TIMELINE</h3>
+      <div class="interrupt-timeline">
+        <div class="int-event">
+          <div class="int-event-title">🔵 MAIN LOOP RUNNING</div>
+          <div class="int-event-desc">Telemetry collection, housekeeping tasks...</div>
+        </div>
+        <div class="int-event">
+          <div class="int-event-title" style="color:var(--neon-orange);">⚠️ HARDWARE EVENT FIRES</div>
+          <div class="int-event-desc">Gyroscope detects rotation > threshold → triggers IRQ pin</div>
+        </div>
+        <div class="int-event">
+          <div class="int-event-title" style="color:#ffbd2e;">⚡ CPU SAVES CONTEXT</div>
+          <div class="int-event-desc">PC, registers pushed to stack in ~4 cycles (nanoseconds)</div>
+        </div>
+        <div class="int-event">
+          <div class="int-event-title" style="color:var(--neon-green);">✅ ISR EXECUTES</div>
+          <div class="int-event-desc">GYRO_IRQHandler() runs — reads data, fires correction thrust</div>
+        </div>
+        <div class="int-event">
+          <div class="int-event-title">🔵 MAIN LOOP RESUMES</div>
+          <div class="int-event-desc">Context restored, continues exactly where interrupted</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="code-block" style="margin-bottom:1rem;">
+        <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>interrupt_handler.c</div>
+        <pre><span class="cmt">/* ISR: fires automatically when IRQ triggers */</span>
+<span class="type">void</span> <span class="fn">GYRO_IRQHandler</span>(<span class="type">void</span>) {
+    <span class="cmt">/* Read gyroscope data immediately */</span>
+    <span class="type">GyroData</span> data = <span class="fn">gyro_read_raw</span>();
+
+    <span class="cmt">/* Compute correction vector */</span>
+    <span class="type">ThrustVector</span> correction =
+        <span class="fn">compute_attitude_correction</span>(<span class="op">&amp;</span>data);
+
+    <span class="cmt">/* Apply — must be fast! (&lt;10μs budget) */</span>
+    <span class="fn">thruster_set_vector</span>(<span class="op">&amp;</span>correction);
+
+    <span class="cmt">/* Clear pending interrupt flag */</span>
+    GYRO_ICR = GYRO_INT_CLEAR;
+}
+
+<span class="cmt">/* Setup in init — enable interrupt */</span>
+<span class="type">void</span> <span class="fn">gyro_init</span>(<span class="type">void</span>) {
+    NVIC_EnableIRQ(GYRO_IRQn);
+    NVIC_SetPriority(GYRO_IRQn, <span class="num">0</span>); <span class="cmt">/* highest */</span>
+}</pre>
+      </div>
+      <div class="glass-card">
+        <h3 style="font-family:var(--font-display);font-size:0.85rem;color:var(--neon-cyan);margin-bottom:0.8rem;">INTERRUPT VS POLLING</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);">Interrupts allow the CPU to do useful work 100% of the time. The hardware tells the CPU when something needs attention — instead of Python's <code style="color:var(--neon-orange)">while True: check_sensor()</code> which wastes CPU cycles and still has polling latency. In space, that difference means attitude control that works versus a spinning, uncontrollable spacecraft.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SATELLITE VIZ ===== -->
+<section id="satellite" class="reveal" style="max-width:1200px;">
+  <div class="section-label">// 04 — INTERACTIVE VISUALIZATION</div>
+  <h2 class="section-title">Satellite System<br><span style="color:var(--neon-cyan)">Hover Each Component</span></h2>
+  <p class="section-desc">An annotated satellite schematic. Hover over each component to see the C code and concepts powering it.</p>
+
+  <div id="satellite-viz">
+    <div id="satellite-canvas-wrap">
+      <svg id="sat-svg" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Stars background -->
+        <g id="sat-stars">
+          <circle cx="30" cy="30" r="1" fill="white" opacity="0.5"/>
+          <circle cx="80" cy="60" r="1.5" fill="white" opacity="0.4"/>
+          <circle cx="140" cy="20" r="1" fill="white" opacity="0.6"/>
+          <circle cx="380" cy="40" r="1.5" fill="white" opacity="0.3"/>
+          <circle cx="440" cy="70" r="1" fill="white" opacity="0.5"/>
+          <circle cx="470" cy="20" r="2" fill="white" opacity="0.4"/>
+          <circle cx="50" cy="360" r="1" fill="white" opacity="0.5"/>
+          <circle cx="450" cy="380" r="1.5" fill="white" opacity="0.4"/>
+          <circle cx="420" cy="300" r="1" fill="white" opacity="0.3"/>
+        </g>
+
+        <!-- Orbit ring -->
+        <ellipse cx="250" cy="200" rx="200" ry="60" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="1" stroke-dasharray="6 4"/>
+
+        <!-- SOLAR PANELS LEFT -->
+        <g class="sat-part" id="sp-left" data-component="solar">
+          <rect x="30" y="170" width="110" height="60" rx="4" fill="rgba(0,60,120,0.8)" stroke="#00d4ff" stroke-width="1.5"/>
+          <!-- Panel grid -->
+          <line x1="57" y1="170" x2="57" y2="230" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="84" y1="170" x2="84" y2="230" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="111" y1="170" x2="111" y2="230" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="30" y1="193" x2="140" y2="193" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="30" y1="210" x2="140" y2="210" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <text x="85" y="165" fill="#00d4ff" font-size="9" text-anchor="middle" font-family="Share Tech Mono">SOLAR ARRAY</text>
+        </g>
+
+        <!-- SOLAR PANELS RIGHT -->
+        <g class="sat-part" id="sp-right" data-component="solar">
+          <rect x="360" y="170" width="110" height="60" rx="4" fill="rgba(0,60,120,0.8)" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="387" y1="170" x2="387" y2="230" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="414" y1="170" x2="414" y2="230" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="441" y1="170" x2="441" y2="230" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="360" y1="193" x2="470" y2="193" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <line x1="360" y1="210" x2="470" y2="210" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+          <text x="415" y="165" fill="#00d4ff" font-size="9" text-anchor="middle" font-family="Share Tech Mono">SOLAR ARRAY</text>
+        </g>
+
+        <!-- Main body -->
+        <rect x="155" y="130" width="190" height="140" rx="8" fill="rgba(5,20,50,0.95)" stroke="rgba(0,212,255,0.6)" stroke-width="2"/>
+
+        <!-- CONTROL UNIT (center) -->
+        <g class="sat-part" id="ctrl-unit" data-component="control">
+          <rect x="195" y="155" width="110" height="75" rx="6" fill="rgba(0,40,90,0.9)" stroke="#00ffcc" stroke-width="1.5"/>
+          <text x="250" y="172" fill="#00ffcc" font-size="8" text-anchor="middle" font-family="Share Tech Mono">FLIGHT COMPUTER</text>
+          <!-- CPU chip visual -->
+          <rect x="215" y="178" width="70" height="40" rx="3" fill="rgba(0,255,204,0.08)" stroke="rgba(0,255,204,0.4)" stroke-width="1"/>
+          <text x="250" y="195" fill="#00ffcc" font-size="10" text-anchor="middle" font-family="Share Tech Mono" font-weight="bold">CPU</text>
+          <text x="250" y="208" fill="rgba(0,255,204,0.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono">C RTOS</text>
+          <!-- Pin indicators -->
+          <line x1="215" y1="187" x2="207" y2="187" stroke="rgba(0,255,204,0.5)" stroke-width="1"/>
+          <line x1="215" y1="194" x2="207" y2="194" stroke="rgba(0,255,204,0.5)" stroke-width="1"/>
+          <line x1="215" y1="201" x2="207" y2="201" stroke="rgba(0,255,204,0.5)" stroke-width="1"/>
+          <line x1="285" y1="187" x2="293" y2="187" stroke="rgba(0,255,204,0.5)" stroke-width="1"/>
+          <line x1="285" y1="194" x2="293" y2="194" stroke="rgba(0,255,204,0.5)" stroke-width="1"/>
+          <line x1="285" y1="201" x2="293" y2="201" stroke="rgba(0,255,204,0.5)" stroke-width="1"/>
+        </g>
+
+        <!-- GYROSCOPE (top left of body) -->
+        <g class="sat-part" id="gyroscope" data-component="gyro">
+          <rect x="162" y="137" width="55" height="40" rx="4" fill="rgba(168,85,247,0.15)" stroke="#a855f7" stroke-width="1.5"/>
+          <circle cx="189" cy="157" r="12" fill="none" stroke="rgba(168,85,247,0.6)" stroke-width="1"/>
+          <circle cx="189" cy="157" r="6" fill="rgba(168,85,247,0.3)" stroke="#a855f7" stroke-width="1"/>
+          <text x="189" y="188" fill="#a855f7" font-size="8" text-anchor="middle" font-family="Share Tech Mono">GYRO</text>
+        </g>
+
+        <!-- SENSOR MODULE (top right of body) -->
+        <g class="sat-part" id="sensor-mod" data-component="sensor">
+          <rect x="283" y="137" width="55" height="40" rx="4" fill="rgba(255,107,43,0.15)" stroke="#ff6b2b" stroke-width="1.5"/>
+          <circle cx="310" cy="157" r="10" fill="rgba(255,107,43,0.1)" stroke="#ff6b2b" stroke-width="1"/>
+          <line x1="302" y1="149" x2="318" y2="165" stroke="#ff6b2b" stroke-width="1"/>
+          <line x1="318" y1="149" x2="302" y2="165" stroke="#ff6b2b" stroke-width="1"/>
+          <text x="310" y="188" fill="#ff6b2b" font-size="8" text-anchor="middle" font-family="Share Tech Mono">SENSOR</text>
+        </g>
+
+        <!-- THRUSTERS (bottom) -->
+        <g class="sat-part" id="thruster-l" data-component="thruster">
+          <rect x="162" y="237" width="55" height="25" rx="4" fill="rgba(255,189,46,0.15)" stroke="#ffbd2e" stroke-width="1.5"/>
+          <polygon points="170,250 178,244 178,256" fill="#ffbd2e" opacity="0.8"/>
+          <text x="189" y="252" fill="#ffbd2e" font-size="7" text-anchor="middle" font-family="Share Tech Mono">THRUSTER A</text>
+        </g>
+        <g class="sat-part" id="thruster-r" data-component="thruster">
+          <rect x="283" y="237" width="55" height="25" rx="4" fill="rgba(255,189,46,0.15)" stroke="#ffbd2e" stroke-width="1.5"/>
+          <polygon points="330,250 322,244 322,256" fill="#ffbd2e" opacity="0.8"/>
+          <text x="310" y="252" fill="#ffbd2e" font-size="7" text-anchor="middle" font-family="Share Tech Mono">THRUSTER B</text>
+        </g>
+
+        <!-- ANTENNA -->
+        <g class="sat-part" id="antenna" data-component="antenna">
+          <line x1="250" y1="130" x2="250" y2="90" stroke="#39ff14" stroke-width="2"/>
+          <circle cx="250" cy="82" r="12" fill="rgba(57,255,20,0.1)" stroke="#39ff14" stroke-width="1.5"/>
+          <line x1="238" y1="90" x2="230" y2="78" stroke="rgba(57,255,20,0.5)" stroke-width="1"/>
+          <line x1="262" y1="90" x2="270" y2="78" stroke="rgba(57,255,20,0.5)" stroke-width="1"/>
+          <text x="250" y="74" fill="#39ff14" font-size="8" text-anchor="middle" font-family="Share Tech Mono">ANT</text>
+        </g>
+
+        <!-- Connectors between panels and body -->
+        <rect x="140" y="193" width="15" height="14" fill="rgba(0,212,255,0.3)" stroke="#00d4ff" stroke-width="1"/>
+        <rect x="345" y="193" width="15" height="14" fill="rgba(0,212,255,0.3)" stroke="#00d4ff" stroke-width="1"/>
+
+        <!-- Animated signal lines -->
+        <line x1="250" y1="270" x2="250" y2="320" stroke="rgba(0,212,255,0.3)" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="250" y="335" fill="rgba(0,212,255,0.5)" font-size="8" text-anchor="middle" font-family="Share Tech Mono">EARTH STATION LINK</text>
+      </svg>
+
+      <!-- Tooltip -->
+      <div id="sat-tooltip">
+        <h4 id="tt-title">Component</h4>
+        <p id="tt-desc">Description</p>
+        <div class="tooltip-code" id="tt-code"></div>
+        <div><span class="tooltip-tag" id="tt-tag">concept</span></div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:1.5rem;font-family:var(--font-mono);">
+      💡 Hover over: <span style="color:#a855f7;">GYRO</span> · <span style="color:#ffbd2e;">THRUSTERS</span> · <span style="color:#00ffcc;">FLIGHT COMPUTER</span> · <span style="color:#ff6b2b;">SENSOR</span> · <span style="color:#39ff14;">ANTENNA</span> · <span style="color:#00d4ff;">SOLAR ARRAYS</span>
+    </p>
+  </div>
+</section>
+
+<!-- ===== PIPELINE ===== -->
+<section id="pipeline" class="reveal">
+  <div class="section-label">// 05 — SYSTEM FLOW</div>
+  <h2 class="section-title">Sensor → Actuation<br><span style="color:var(--neon-cyan)">The Full Control Pipeline</span></h2>
+  <p class="section-desc">Every space and defense system follows this fundamental pipeline. C manages each stage with zero-overhead precision.</p>
+
+  <div class="pipeline-flow">
+    <div class="pipe-step" id="pipe-0">
+      <span class="pipe-icon">📡</span>
+      <div class="pipe-name">SENSOR</div>
+      <div class="pipe-sub">ADC / I²C / SPI<br>Raw data acquisition</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" id="pipe-1">
+      <span class="pipe-icon">⚙️</span>
+      <div class="pipe-name">PROCESSING</div>
+      <div class="pipe-sub">Filtering, scaling<br>Signal conditioning</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" id="pipe-2">
+      <span class="pipe-icon">🧮</span>
+      <div class="pipe-name">ALGORITHM</div>
+      <div class="pipe-sub">PID control<br>State estimation</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" id="pipe-3">
+      <span class="pipe-icon">🔍</span>
+      <div class="pipe-name">DECISION</div>
+      <div class="pipe-sub">Threshold checks<br>Safety validation</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" id="pipe-4">
+      <span class="pipe-icon">🚀</span>
+      <div class="pipe-name">ACTUATION</div>
+      <div class="pipe-sub">Motor / Thruster<br>GPIO / PWM output</div>
+    </div>
+  </div>
+
+  <div class="pipeline-sim">
+    <div class="sim-title">▶ LIVE SIMULATION — ATTITUDE CONTROL LOOP</div>
+    <div class="sim-log" id="simLog">
+      <div style="color:var(--text-muted);">[SYSTEM] Ready. Press START to simulate control loop.</div>
+    </div>
+    <button class="sim-btn" id="simBtn" onclick="startSim()">▶ START SIMULATION</button>
+  </div>
+</section>
+
+<!-- ===== REAL WORLD ===== -->
+<section id="realworld" class="reveal">
+  <div class="section-label">// 06 — REAL WORLD SYSTEMS</div>
+  <h2 class="section-title">C in the Wild —<br><span style="color:var(--neon-cyan)">Mission Critical Applications</span></h2>
+  <p class="section-desc">From orbit to the battlefield, these real systems trust their lives to C code.</p>
+
+  <div class="realworld-grid">
+    <div class="rw-card">
+      <div class="rw-header">
+        <span class="rw-emoji">🛰️</span>
+        <div class="rw-title-wrap">
+          <div class="rw-title">SATELLITE CONTROL</div>
+          <div class="rw-sub">Attitude Determination & Control</div>
+        </div>
+      </div>
+      <div class="rw-body">
+        <p>Manages 3-axis orientation using gyroscopes, star trackers, and reaction wheels. C runs a 100Hz control loop computing quaternion-based attitude corrections.</p>
+        <p style="color:var(--text-muted);font-size:0.8rem;font-style:italic;">"NASA's cFE (Core Flight Executive) — the standard spacecraft OS — is written entirely in C."</p>
+        <div class="rw-tags">
+          <span class="rw-tag tag-blue">Interrupt-driven</span>
+          <span class="rw-tag tag-purple">Pointers</span>
+          <span class="rw-tag tag-green">Real-time</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rw-card">
+      <div class="rw-header">
+        <span class="rw-emoji">🎯</span>
+        <div class="rw-title-wrap">
+          <div class="rw-title">MISSILE GUIDANCE</div>
+          <div class="rw-sub">Inertial Navigation System</div>
+        </div>
+      </div>
+      <div class="rw-body">
+        <p>Integrates accelerometer and gyroscope data at 1000Hz to compute position. C processes Kalman filter equations in real-time with microsecond latency requirements.</p>
+        <p style="color:var(--text-muted);font-size:0.8rem;font-style:italic;">"INS systems run on bare-metal C with no OS — every clock cycle is mission-critical."</p>
+        <div class="rw-tags">
+          <span class="rw-tag tag-orange">Bare-metal</span>
+          <span class="rw-tag tag-blue">Bit manipulation</span>
+          <span class="rw-tag tag-green">DSP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rw-card">
+      <div class="rw-header">
+        <span class="rw-emoji">🚁</span>
+        <div class="rw-title-wrap">
+          <div class="rw-title">DRONE FLIGHT CTRL</div>
+          <div class="rw-sub">Autopilot & Stabilization</div>
+        </div>
+      </div>
+      <div class="rw-body">
+        <p>ArduPilot and PX4 — the dominant open-source drone flight controllers — run C/C++ at 400Hz. PID loops keep the drone stable against wind, managing 4 motor speeds simultaneously.</p>
+        <p style="color:var(--text-muted);font-size:0.8rem;font-style:italic;">"PX4's NuttX RTOS and ArduPilot HAL are C-based for deterministic control."</p>
+        <div class="rw-tags">
+          <span class="rw-tag tag-purple">PID control</span>
+          <span class="rw-tag tag-blue">RTOS</span>
+          <span class="rw-tag tag-orange">PWM</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rw-card">
+      <div class="rw-header">
+        <span class="rw-emoji">🚗</span>
+        <div class="rw-title-wrap">
+          <div class="rw-title">AUTOMOTIVE ECU</div>
+          <div class="rw-sub">Engine Control Unit</div>
+        </div>
+      </div>
+      <div class="rw-body">
+        <p>Modern cars have 70-100 ECUs running AUTOSAR-compliant C code. Fuel injection timing, ABS brake control, airbag deployment — all C. MISRA-C standard mandates certified, safe C code.</p>
+        <p style="color:var(--text-muted);font-size:0.8rem;font-style:italic;">"ISO 26262 functional safety standard is built around C code verification."</p>
+        <div class="rw-tags">
+          <span class="rw-tag tag-green">MISRA-C</span>
+          <span class="rw-tag tag-blue">AUTOSAR</span>
+          <span class="rw-tag tag-purple">Safety critical</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAULT TOLERANCE ===== -->
+<section id="fault" class="reveal">
+  <div class="section-label">// 07 — SAFETY & RELIABILITY</div>
+  <h2 class="section-title">Fault Tolerance<br><span style="color:var(--neon-cyan)">When Failure is Not an Option</span></h2>
+  <p class="section-desc">Space systems must survive hardware failures, radiation-induced bit flips, and unexpected states. C provides the mechanisms to detect, recover, and survive.</p>
+
+  <div class="fault-grid">
+    <div>
+      <h3 style="font-family:var(--font-display);font-size:0.9rem;color:var(--neon-cyan);margin-bottom:1.5rem;letter-spacing:1px;">FAULT → DETECTION → RECOVERY</h3>
+      <div class="fault-flow">
+        <div class="fault-node fault">
+          <span class="fault-icon">⚠️</span>
+          <div class="fault-text-wrap">
+            <div class="fault-node-title">FAULT DETECTED</div>
+            <div class="fault-node-desc">Sensor out of range / watchdog timeout / checksum fail</div>
+          </div>
+        </div>
+        <div class="fault-connector"></div>
+        <div class="fault-node detect">
+          <span class="fault-icon">🔍</span>
+          <div class="fault-text-wrap">
+            <div class="fault-node-title">TELEMETRY ANALYSIS</div>
+            <div class="fault-node-desc">C compares sensor values against safe operating envelope</div>
+          </div>
+        </div>
+        <div class="fault-connector"></div>
+        <div class="fault-node recover">
+          <span class="fault-icon">🔄</span>
+          <div class="fault-text-wrap">
+            <div class="fault-node-title">RECOVERY ACTION</div>
+            <div class="fault-node-desc">Switch to backup sensor / reset subsystem / recalibrate</div>
+          </div>
+        </div>
+        <div class="fault-connector"></div>
+        <div class="fault-node safe">
+          <span class="fault-icon">🛡️</span>
+          <div class="fault-text-wrap">
+            <div class="fault-node-title">SAFE MODE ENTRY</div>
+            <div class="fault-node-desc">Minimum power state, pointing at sun, awaiting ground command</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.5rem;">
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>watchdog.c</div>
+        <pre><span class="cmt">/* Hardware watchdog timer — auto-resets CPU
+   if software hangs/freezes */</span>
+<span class="type">void</span> <span class="fn">watchdog_init</span>(<span class="type">uint32_t</span> timeout_ms) {
+    <span class="cmt">/* Set timeout: if not kicked in time → reset */</span>
+    IWDG_PR  = <span class="num">0x04</span>;  <span class="cmt">/* prescaler /64   */</span>
+    IWDG_RLR = timeout_ms <span class="op">*</span> <span class="num">40</span>;
+    IWDG_KR  = <span class="num">0xCCCC</span>; <span class="cmt">/* start watchdog  */</span>
+}
+
+<span class="cmt">/* Called every 100ms in main loop */</span>
+<span class="kw">inline</span> <span class="type">void</span> <span class="fn">watchdog_kick</span>(<span class="type">void</span>) {
+    IWDG_KR = <span class="num">0xAAAA</span>; <span class="cmt">/* reload counter  */</span>
+}
+
+<span class="cmt">/* If main loop hangs → watchdog fires
+   → hardware reset → controlled restart */</span></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div>safe_mode.c</div>
+        <pre><span class="type">void</span> <span class="fn">safe_mode_entry</span>(<span class="type">FaultCode</span> fault) {
+    <span class="cmt">/* Log fault to non-volatile storage */</span>
+    <span class="fn">nvram_write</span>(FAULT_LOG_ADDR, fault);
+
+    <span class="cmt">/* Power down non-essential systems */</span>
+    <span class="fn">subsystem_powerdown</span>(SYS_PAYLOAD);
+    <span class="fn">subsystem_powerdown</span>(SYS_COMMS_HI);
+
+    <span class="cmt">/* Point solar panels at sun */</span>
+    <span class="fn">adcs_sun_point_mode</span>();
+
+    <span class="cmt">/* Beacon low-power telemetry */</span>
+    <span class="kw">while</span>(<span class="num">1</span>) {
+        <span class="fn">transmit_beacon</span>(BEACON_SAFE_MODE);
+        <span class="fn">watchdog_kick</span>();
+        <span class="fn">sleep_ms</span>(<span class="num">30000</span>); <span class="cmt">/* 30s beacon */</span>
+    }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer style="max-width:100%;padding:3rem 2rem;border-top: 1px solid var(--border-glow);">
+  <p style="font-family:var(--font-display);font-size:0.8rem;margin-bottom:0.5rem;">C PROGRAMMING IN SPACE &amp; DEFENSE SYSTEMS</p>
+  <p>FROM ORBIT STABILIZATION TO MISSILE GUIDANCE — <span>C REMAINS THE BACKBONE OF MISSION-CRITICAL COMPUTING</span></p>
+  <p style="margin-top:1rem;opacity:0.5;">WHERE PRECISION, RELIABILITY AND SURVIVAL ARE NON-NEGOTIABLE</p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ============================================================
+// STAR FIELD CANVAS
+// ============================================================
+(function() {
+  const canvas = document.getElementById('starCanvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let W, H;
+  let animFrame;
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function createStars(n) {
+    stars = [];
+    for (let i = 0; i < n; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.5 + 0.3,
+        speed: Math.random() * 0.15 + 0.03,
+        alpha: Math.random(),
+        dAlpha: (Math.random() - 0.5) * 0.005
+      });
+    }
+  }
+
+  // A few slow-moving "satellites"
+  const sats = Array.from({length: 3}, (_, i) => ({
+    x: Math.random() * 800,
+    y: Math.random() * 300 + 50,
+    speed: (i + 1) * 0.4
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Deep space gradient
+    const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, H);
+    grad.addColorStop(0, 'rgba(0,8,28,1)');
+    grad.addColorStop(1, 'rgba(2,8,16,1)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars
+    for (const s of stars) {
+      s.alpha += s.dAlpha;
+      if (s.alpha > 1 || s.alpha < 0) s.dAlpha *= -1;
+      s.alpha = Math.max(0.1, Math.min(1, s.alpha));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,220,255,${s.alpha})`;
+      ctx.fill();
+      // Drift slowly
+      s.x += s.speed * 0.1;
+      if (s.x > W) s.x = 0;
+    }
+
+    // Moving satellites
+    for (const sat of sats) {
+      sat.x += sat.speed;
+      if (sat.x > W + 20) sat.x = -20;
+      // Body
+      ctx.save();
+      ctx.translate(sat.x, sat.y);
+      ctx.fillStyle = 'rgba(0,212,255,0.7)';
+      ctx.fillRect(-4, -2, 8, 4);
+      // Panels
+      ctx.fillStyle = 'rgba(0,212,255,0.4)';
+      ctx.fillRect(-12, -1, 7, 2);
+      ctx.fillRect(5, -1, 7, 2);
+      // Glow
+      ctx.beginPath();
+      ctx.arc(0, 0, 3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(0,255,204,0.5)';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Grid overlay
+    ctx.strokeStyle = 'rgba(0,212,255,0.04)';
+    ctx.lineWidth = 1;
+    const gSize = 60;
+    for (let x = 0; x < W; x += gSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += gSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    animFrame = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); createStars(200); });
+  resize();
+  createStars(200);
+  draw();
+})();
+
+// ============================================================
+// LANGUAGE COMPARISON TABS
+// ============================================================
+function switchLang(lang) {
+  document.querySelectorAll('.lang-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + lang).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ============================================================
+// CONCEPT TABS
+// ============================================================
+function switchConcept(name) {
+  document.querySelectorAll('.concept-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.concept-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('concept-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ============================================================
+// BIT MANIPULATION INTERACTIVE
+// ============================================================
+(function() {
+  const bitRow = document.getElementById('bitRow');
+  const hexEl = document.getElementById('bitHex');
+  const cntEl = document.getElementById('bitCount');
+  let bits = new Array(8).fill(0);
+
+  const colors = [
+    'var(--neon-orange)', 'var(--neon-orange)',
+    'var(--neon-cyan)', 'var(--neon-cyan)',
+    'var(--neon-purple)', 'var(--neon-purple)',
+    'var(--neon-green)', 'var(--neon-green)'
+  ];
+
+  function render() {
+    bitRow.innerHTML = '';
+    bits.forEach((b, i) => {
+      const el = document.createElement('div');
+      el.className = 'bit ' + (b ? 'bit-1' : 'bit-0');
+      el.textContent = b;
+      el.title = `Bit ${7-i}`;
+      if (b) el.style.boxShadow = `0 0 10px ${colors[i]}`;
+      el.addEventListener('click', () => {
+        bits[i] = bits[i] ? 0 : 1;
+        render();
+      });
+      bitRow.appendChild(el);
+    });
+    const val = bits.reduce((acc, b, i) => acc + (b << (7 - i)), 0);
+    hexEl.textContent = '0x' + val.toString(16).toUpperCase().padStart(2, '0');
+    cntEl.textContent = bits.filter(b => b).length;
+  }
+  render();
+})();
+
+// ============================================================
+// SATELLITE TOOLTIP
+// ============================================================
+(function() {
+  const tooltip = document.getElementById('sat-tooltip');
+  const wrap = document.getElementById('satellite-canvas-wrap');
+
+  const data = {
+    control: {
+      title: 'Flight Computer (CPU)',
+      desc: 'The brain of the satellite — runs FreeRTOS with C tasks for ADCS, telemetry, and command handling. Executes 100Hz control loops.',
+      code: `// Main control task (100Hz)
+void adcs_task(void *pvParams) {
+  TickType_t xLast = xTaskGetTickCount();
+  for(;;) {
+    SensorData s = sensors_read_all();
+    Quaternion q = compute_attitude(&s);
+    actuators_apply(&q);
+    vTaskDelayUntil(&xLast, 10); // 10ms
+  }
+}`,
+      tag: 'RTOS • Real-Time • Scheduler'
+    },
+    gyro: {
+      title: 'Gyroscope (IMU)',
+      desc: 'Measures angular rate on 3 axes via SPI at 1kHz. An interrupt fires when new data is ready — C ISR reads it immediately.',
+      code: `void GYRO_SPI_IRQHandler(void) {
+  int16_t raw[3];
+  spi_read_burst(GYRO_ADDR, raw, 6);
+  // Scale: ±2000°/s range
+  gyro.x = raw[0] * 0.0610f; // °/s
+  gyro.y = raw[1] * 0.0610f;
+  gyro.z = raw[2] * 0.0610f;
+  EXTI_PR = GYRO_PIN; // clear IRQ
+}`,
+      tag: 'Interrupt • SPI • Bit Manipulation'
+    },
+    sensor: {
+      title: 'Sensor Module',
+      desc: 'Star tracker camera + sun sensors for absolute attitude reference. Processed with C image algorithms to compute pointing vector.',
+      code: `// Star tracker centroid computation
+StarVector compute_star_vec(Image *img) {
+  StarVector v = {0};
+  uint32_t flux = 0;
+  for (int i = 0; i < IMG_SIZE; i++) {
+    if (img->data[i] > STAR_THRESHOLD) {
+      v.x += i % WIDTH * img->data[i];
+      v.y += i / WIDTH * img->data[i];
+      flux += img->data[i];
+    }
+  }
+  v.x /= flux; v.y /= flux; // centroid
+  return v;
+}`,
+      tag: 'Pointers • Arrays • Image Processing'
+    },
+    thruster: {
+      title: 'Thruster (RCS)',
+      desc: 'Reaction control thrusters fired in microsecond pulses to adjust attitude. C writes directly to PWM register to control pulse width.',
+      code: `#define THRUSTER_REG *(volatile uint32_t*)0x40000060
+
+void fire_thruster(uint8_t id, uint16_t us) {
+  // Set pulse width (microseconds)
+  uint32_t ticks = us * (SYSCLK / 1000000UL);
+  // Bit-field: [31:16]=pulse [15:8]=id [7:0]=ctrl
+  THRUSTER_REG = (ticks << 16)
+               | ((uint32_t)id << 8)
+               | 0x01; // fire bit
+}`,
+      tag: 'Bit Manipulation • Hardware Register • PWM'
+    },
+    antenna: {
+      title: 'Antenna (UHF/S-Band)',
+      desc: 'Transmits telemetry and receives commands. C encodes/decodes CCSDS packets with CRC checksums for reliable deep-space communication.',
+      code: `uint16_t ccsds_crc16(uint8_t *data, uint16_t len) {
+  uint16_t crc = 0xFFFF;
+  while (len--) {
+    crc ^= (*data++ << 8);
+    for (int i = 0; i < 8; i++) {
+      if (crc & 0x8000)
+        crc = (crc << 1) ^ 0x1021;
+      else
+        crc <<= 1;
+    }
+  }
+  return crc; // CCITT CRC-16
+}`,
+      tag: 'Bit Ops • Checksums • Protocol'
+    },
+    solar: {
+      title: 'Solar Array',
+      desc: 'C monitors power bus voltage via ADC at 10Hz. Maximum Power Point Tracking (MPPT) algorithm adjusts panel angle using a stepper motor.',
+      code: `// MPPT: Perturb & Observe algorithm
+void mppt_update(void) {
+  uint16_t v = adc_read(V_BUS_CH);
+  uint16_t i = adc_read(I_BUS_CH);
+  uint32_t p_now = (uint32_t)v * i;
+
+  if (p_now > mppt.p_prev) {
+    panel_angle += mppt.direction;
+  } else {
+    mppt.direction = -mppt.direction;
+    panel_angle += mppt.direction;
+  }
+  mppt.p_prev = p_now;
+  stepper_set_angle(panel_angle);
+}`,
+      tag: 'ADC • Control Algorithm • Power'
+    }
+  };
+
+  document.querySelectorAll('.sat-part').forEach(part => {
+    part.addEventListener('mouseenter', function(e) {
+      const comp = this.dataset.component;
+      if (!data[comp]) return;
+      const d = data[comp];
+      document.getElementById('tt-title').textContent = d.title;
+      document.getElementById('tt-desc').textContent = d.desc;
+      document.getElementById('tt-code').textContent = d.code;
+      document.getElementById('tt-tag').textContent = d.tag;
+      tooltip.classList.add('visible');
+      positionTooltip(e);
+    });
+    part.addEventListener('mousemove', positionTooltip);
+    part.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+  });
+
+  function positionTooltip(e) {
+    const rect = wrap.getBoundingClientRect();
+    let x = e.clientX - rect.left + 15;
+    let y = e.clientY - rect.top - 80;
+    // Keep in bounds
+    if (x + 290 > wrap.offsetWidth) x = e.clientX - rect.left - 295;
+    if (y < 0) y = 10;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  }
+})();
+
+// ============================================================
+// PIPELINE SIMULATION
+// ============================================================
+let simRunning = false;
+let simInterval;
+let simStep = 0;
+
+const simMessages = [
+  { type: 'ok', msg: 'GYRO_IRQ: New sensor data @ 0x40001000' },
+  { type: 'data', msg: 'SENSOR: ω=[+0.023, -0.011, +0.004] rad/s' },
+  { type: 'ok', msg: 'FILTER: Kalman prediction step complete' },
+  { type: 'data', msg: 'ATTITUDE: q=[0.999, 0.012, -0.005, 0.002]' },
+  { type: 'ok', msg: 'PID: Error ε=0.023 → correction Δ=0.008' },
+  { type: 'data', msg: 'DECISION: |error| < 0.05 — nominal' },
+  { type: 'ok', msg: 'THRUSTER: PWM duty=12% on CH_A, 8% on CH_B' },
+  { type: 'data', msg: 'ACTUATION: THRUSTER_REG = 0x1F0A' },
+  { type: 'ok', msg: 'WATCHDOG: kicked @ t=100ms' },
+  { type: 'data', msg: 'TELEMETRY: 48-byte packet queued for TX' },
+  { type: 'warn', msg: 'POWER: Bus voltage 28.1V — nominal' },
+  { type: 'ok', msg: 'LOOP: cycle time = 8.7ms / 10ms budget ✓' },
+];
+
+function startSim() {
+  if (simRunning) {
+    clearInterval(simInterval);
+    simRunning = false;
+    document.getElementById('simBtn').textContent = '▶ START SIMULATION';
+    document.querySelectorAll('.pipe-step').forEach(s => s.classList.remove('active-step'));
+    return;
+  }
+  simRunning = true;
+  simStep = 0;
+  document.getElementById('simBtn').textContent = '■ STOP SIMULATION';
+  document.getElementById('simLog').innerHTML = '';
+  runSimStep();
+  simInterval = setInterval(runSimStep, 800);
+}
+
+function runSimStep() {
+  const log = document.getElementById('simLog');
+  const msg = simMessages[simStep % simMessages.length];
+  const time = new Date().toISOString().substr(11, 12);
+
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${msg.type}">${msg.msg}</span>`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+
+  // Highlight pipeline step
+  const pipeMap = [0, 0, 1, 1, 2, 3, 4, 4, 0, 4, 0, 0];
+  document.querySelectorAll('.pipe-step').forEach(s => s.classList.remove('active-step'));
+  const activeIdx = pipeMap[simStep % simMessages.length];
+  document.getElementById('pipe-' + activeIdx)?.classList.add('active-step');
+
+  simStep++;
+}
+
+// ============================================================
+// SCROLL REVEAL
+// ============================================================
+const revealEls = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+revealEls.forEach(el => revealObserver.observe(el));
+
+// ============================================================
+// METRIC BAR ANIMATION ON SCROLL
+// ============================================================
+const metricObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.metric-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0%';
+        requestAnimationFrame(() => {
+          setTimeout(() => { bar.style.width = w; }, 100);
+        });
+      });
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.metrics-grid').forEach(g => metricObserver.observe(g));
+</script>
+</body>
+</html>
